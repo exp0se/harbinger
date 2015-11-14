@@ -120,9 +120,9 @@ def urlvoid(html_page):
         return
 
 
-def vt_ip(ip):
+def vt_ip(ip, api):
     url = "https://www.virustotal.com/vtapi/v2/ip-address/report"
-    params = {"ip": ip, "apikey": VT_API}
+    params = {"ip": ip, "apikey": api}
     r = requests.get(url, params, headers=UA)
     if r.status_code == 204:
         return 204
@@ -172,9 +172,9 @@ def vt_ip(ip):
         print("Something went wrong. VT status code: %s" % r.status_code)
 
 
-def vt_domain(domain):
+def vt_domain(domain, api):
     url = "https://www.virustotal.com/vtapi/v2/domain/report"
-    params = {"domain": domain, "apikey": VT_API}
+    params = {"domain": domain, "apikey": api}
     r = requests.get(url, params, headers=UA)
     if r.status_code == 204:
         return 204
@@ -229,9 +229,9 @@ def vt_domain(domain):
         print("Something went wrong, VT status code: %s" % r.status_code)
 
 
-def vt_hash(h):
+def vt_hash(h, api):
     url = "https://www.virustotal.com/vtapi/v2/file/report"
-    params = {"resource": h, "apikey": VT_API}
+    params = {"resource": h, "apikey": api}
     r = requests.get(url, params, headers=UA)
     if r.status_code == 204:
         return 204
@@ -248,10 +248,10 @@ def vt_hash(h):
         print("Something went wrong, VT status code: %s" % r.status_code)
 
 
-def vt_url(domain):
+def vt_url(domain, api):
     if domain:
         url = "https://www.virustotal.com/vtapi/v2/url/report"
-        params = {"resource": "http://" + domain, "apikey": VT_API}
+        params = {"resource": "http://" + domain, "apikey": api}
         r = requests.get(url, params, headers=UA)
         if r.status_code == 204:
             return 204
@@ -295,13 +295,13 @@ def main():
         data = get_data("http://ipvoid.com/scan/", args.ip)
         ipvoid_results = ipvoid(data)
         if args.vtapi:
-            vt_data = vt_ip(args.ip)
+            vt_data = vt_ip(args.ip, args.vtapi)
             counter = 0
             while vt_data == 204 and counter < 3:
                 print("Virustotal API limit reached. Public API limit is 4 req/per minute."
                       "Sleeping for 30 seconds. Will try 3 attempts.")
                 sleep(30)
-                vt_data = vt_ip(args.ip)
+                vt_data = vt_ip(args.ip, args.vtapi)
                 counter += 1
             if vt_data and counter < 3:
                 print('''
@@ -354,15 +354,15 @@ def main():
             cymon_data = cymon(domain=args.domain)
         data = get_data("http://urlvoid.com/scan/", args.domain)
         if args.vtapi:
-            vt_data1 = vt_domain(args.domain)
-            vt_data2 = vt_url(args.domain)
+            vt_data1 = vt_domain(args.domain, args.vtapi)
+            vt_data2 = vt_url(args.domain, args.vtapi)
             counter = 0
             while vt_data1 == 204 or vt_data2 == 204 and counter < 3:
                 print("Virustotal API limit reached. Public API limit is 4 req/per minute."
                       "Sleeping for 30 seconds. Will try 3 attempts.")
                 sleep(30)
-                vt_data1 = vt_domain(args.domain)
-                vt_data2 = vt_url(args.domain)
+                vt_data1 = vt_domain(args.domain, args.vtapi)
+                vt_data2 = vt_url(args.domain, args.vtapi)
                 counter += 1
             if vt_data1 and vt_data2 and counter < 3:
                 print('''
@@ -426,13 +426,13 @@ def main():
             ''' % (args.domain, cymon_data.get('created'), cymon_data.get('updated'), cymon_data.get('sources')))
     elif args.hash:
         if args.vtapi:
-            vt_data = vt_hash(args.hash)
+            vt_data = vt_hash(args.hash, args.vtapi)
             counter = 0
             while vt_data == 204 and counter < 3:
                 print("Virustotal API limit reached. Public API limit is 4 req/per minute."
                       "Sleeping for 30 seconds. Will try 3 attempts.")
                 sleep(30)
-                vt_data = vt_hash(args.hash)
+                vt_data = vt_hash(args.hash, args.vtapi)
                 counter += 1
             if vt_data and counter < 3:
                 print('''
@@ -488,13 +488,13 @@ def main():
                         results["ipvoid_location"] = ipvoid_results[6]
                         results["ipvoid_url"] = "http://ipvoid.com/scan/" + ip
                 if args.vtapi:
-                    vt_data = vt_ip(ip)
+                    vt_data = vt_ip(ip, args.vtapi)
                     counter = 0
                     while vt_data == 204 and counter < 3:
                         print("Virustotal API limit reached. Public API limit is 4 req/per minute."
                               "Sleeping for 30 seconds. Will try 3 attempts.")
                         sleep(30)
-                        vt_data = vt_ip(ip)
+                        vt_data = vt_ip(ip, args.vtapi)
                         counter += 1
                     if vt_data and counter < 3:
                         last10_ip_resolutions = []
@@ -561,15 +561,15 @@ def main():
                         results["urlvoid_ip_location"] = urlvoid_results[9]
                         results["urlvoid_url"] = "http://urlvoid.com/scan/" + domain
                 if args.vtapi:
-                    vt_data1 = vt_domain(domain)
-                    vt_data2 = vt_url(domain)
+                    vt_data1 = vt_domain(domain, args.vtapi)
+                    vt_data2 = vt_url(domain, args.vtapi)
                     counter = 0
                     while vt_data1 == 204 or vt_data2 == 204 and counter < 3:
                         print("Virustotal API limit reached. Public API limit is 4 req/per minute."
                               "Sleeping for 30 second. Will try 3 attempts.")
                         sleep(30)
-                        vt_data1 = vt_domain(domain)
-                        vt_data2 = vt_url(domain)
+                        vt_data1 = vt_domain(domain, args.vtapi)
+                        vt_data2 = vt_url(domain, args.vtapi)
                         counter += 1
                     if vt_data1 and vt_data2 and counter < 3:
                         last10_ip_resolutions = []
@@ -608,13 +608,13 @@ def main():
                 print("Working on %s" % h)
                 results["hash"] = h
                 if args.vtapi:
-                    vt_data = vt_hash(h)
+                    vt_data = vt_hash(h, args.vtapi)
                     counter = 0
                     while vt_data == 204 and counter < 3:
                         print("Virustotal API limit reached. Public API limit is 4 req/per minute."
                               "Sleeping for 30 seconds. Will try 3 attempts.")
                         sleep(30)
-                        vt_data = vt_hash(h)
+                        vt_data = vt_hash(h, args.vtapi)
                         counter += 1
                         print(counter)
                     if vt_data and counter < 3:
