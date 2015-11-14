@@ -1,0 +1,3 @@
+requests
+cymon
+beautifulsoup4
