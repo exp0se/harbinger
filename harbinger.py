@@ -319,14 +319,15 @@ def main():
             How many undetected samples embed this IP in their strings: %s
                 ''' % (args.ip, vt_data[0], vt_data[1], vt_data[2], vt_data[3], vt_data[4], vt_data[5], vt_data[6],
                        vt_data[8], vt_data[9], vt_data[10]))
-            print('''
-            The following domains resolve to this IP(last 10): ''')
-            sorted_ips = sorted(vt_data[7], key=itemgetter("last_resolved"), reverse=True)
-            for i in sorted_ips[:10]:
+            if vt_data[7]:
                 print('''
-            Domain: %s ''' % i.get("hostname"),
-            '''
-            Last resolved: %s''' % i.get("last_resolved"))
+                The following domains resolve to this IP(last 10): ''')
+                sorted_ips = sorted(vt_data[7], key=itemgetter("last_resolved"), reverse=True)
+                for i in sorted_ips[:10]:
+                    print('''
+                Domain: %s ''' % i.get("hostname"),
+                '''
+                Last resolved: %s''' % i.get("last_resolved"))
         if cymon_data:
             print('''
             Cymon report for IP %s
@@ -390,14 +391,15 @@ def main():
                 ''' % (args.domain, vt_data2[1], vt_data2[0], vt_data1[1], vt_data1[2], vt_data1[4], vt_data1[8],
                        vt_data1[12], vt_data1[9], vt_data1[5], vt_data1[6], vt_data1[7], vt_data1[10], vt_data1[11],
                        vt_data1[3], vt_data1[14], vt_data1[13]))
-                print('''
-                This domain resolves to following IPs(last 10): ''')
-                sorted_ips = sorted(vt_data1[0], key=itemgetter('last_resolved'), reverse=True)
-                for i in sorted_ips[:10]:
+                if vt_data1[0]:
                     print('''
-                IP: %s''' % i.get("ip_address"),
-                '''
-                Last resolved: %s''' % i.get("last_resolved"))
+                    This domain resolves to following IPs(last 10): ''')
+                    sorted_ips = sorted(vt_data1[0], key=itemgetter('last_resolved'), reverse=True)
+                    for i in sorted_ips[:10]:
+                        print('''
+                    IP: %s''' % i.get("ip_address"),
+                    '''
+                    Last resolved: %s''' % i.get("last_resolved"))
         if data:
             urlvoid_results = urlvoid(data)
             if urlvoid_results:
