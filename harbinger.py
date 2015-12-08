@@ -323,7 +323,7 @@ def main():
                 try:
                     print('''
                     The following domains resolve to this IP(last 10): ''')
-                    sorted_ips = sorted(vt_data[7], key=itemgetter("las_resolved"), reverse=True)
+                    sorted_ips = sorted(vt_data[7], key=itemgetter("last_resolved"), reverse=True)
                     for i in sorted_ips[:10]:
                         print('''
                     Domain: %s ''' % i.get("hostname"),
